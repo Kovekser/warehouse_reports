@@ -24,11 +24,12 @@ class CSVReports:
     async def generate_csv_report(self):
         try:
             with open(self.csv_name, 'w', newline='') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.head)
+                writer = csv.DictWriter(csvfile, fieldnames=self.head, delimeter=',', quotechar='"')
 
                 writer.writeheader()
                 writer.writerows(self.__data)
             return {'msg': f'Report {self.csv_name} was successfully generated and downloaded to disc'}
         except ValueError as err:
-            os.remove(self.csv_name)
+            if os.path.exists(self.csv_name):
+                os.remove(self.csv_name)
             return {'error': str(err)}
