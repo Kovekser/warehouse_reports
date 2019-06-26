@@ -2,12 +2,16 @@ from sanic.views import HTTPMethodView
 from sanic.response import json
 
 from service_api.services.tasks import generate_csv_report
+from service_api.forms import ReportInputSchema
 
 
 class GenerateReportResource(HTTPMethodView):
     async def post(self, request):
-        rtype, headers, data = request.json['rtype'], request.json['headers'], request.json['data']
-        # For Oleh: may be its better instead of the code line above to write
-        # locals().update(request.json) - creates automatically vars rtype, headers, data
-        result_msg = generate_csv_report.delay(rtype, headers, data)
-        return json(result_msg.get(timeout=2), status=200)
+        data, err = ReportInputSchema().load(request.json)
+        if err:
+            return json({'Errors': err}, status=404)
+        try:
+            result_msg = generate_csv_report.delay(data['rtype'], data['headers'], data['data'])
+            return json(result_msg.get(timeout=2), status=200)
+        except ValueError as err:
+            return json({'error': str(err)}, status=404)

@@ -1,12 +1,11 @@
 import csv
 import os
-import logging
 from datetime import datetime
 
 
-class Reports:
+class CSVReports:
     def __init__(self, rtype, head, data):
-        self.csv_name = f'{rtype}_{datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S")}.csv'
+        self.csv_name = f'{rtype}_{datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S_%f")}.csv'
         self.head = head
         self.__data = self.check_data(data, head)
 
@@ -19,20 +18,18 @@ class Reports:
         """
         for i, row in enumerate(data):
             if len(row) != len(head):
-                del(data[i])
-                logging.error(f'The length of row {i+1} doesn\'t match to the length of the header')
-                continue
+                raise ValueError(f'The length of row {i+1} doesn\'t match to the length of the header')
         return data
 
-    async def download_csv_report(self):
-        print('Starting downloading')
+    async def generate_csv_report(self):
         try:
             with open(self.csv_name, 'w', newline='') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.head)
+                writer = csv.DictWriter(csvfile, fieldnames=self.head, delimeter=',', quotechar='"')
 
                 writer.writeheader()
                 writer.writerows(self.__data)
-            return {'msg': f'Report {self.csv_name} was successfully downloaded to disc'}
+            return {'msg': f'Report {self.csv_name} was successfully generated and downloaded to disc'}
         except ValueError as err:
-            os.remove(self.csv_name)
+            if os.path.exists(self.csv_name):
+                os.remove(self.csv_name)
             return {'error': str(err)}

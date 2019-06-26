@@ -2,12 +2,12 @@ import asyncio
 import uvloop
 from celery import shared_task
 
-from service_api.domain.reports import Reports
+from service_api.domain.reports import CSVReports
 
 
 @shared_task
 def generate_csv_report(rtype, headers, data):
-    result = run_in_new_loop(Reports(rtype, headers, data).download_csv_report())
+    result = run_in_new_loop(CSVReports(rtype, headers, data).generate_csv_report())
     return result
 
 
