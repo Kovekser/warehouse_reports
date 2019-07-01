@@ -1,4 +1,3 @@
-from os import path
 from celery.result import AsyncResult
 from sqlalchemy import select
 
@@ -50,5 +49,4 @@ async def get_file_name_by_id(document_id):
 
 async def download_file(document_id):
     file_url = await get_file_name_by_id(document_id)
-    with open(file_url['file_name'], 'rb') as fr, open(path.join('uploads', file_url['file_name']), 'wb') as fw:
-        fw.write(fr.read())
+    return file_url['file_name']

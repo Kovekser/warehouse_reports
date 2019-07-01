@@ -1,6 +1,5 @@
-from time import sleep, localtime
 from sanic.views import HTTPMethodView
-from sanic.response import json
+from sanic.response import json, file
 
 from service_api.services.tasks import generate_csv_report
 from service_api.forms import ReportInputSchema
@@ -33,5 +32,7 @@ class StatusReportResource(HTTPMethodView):
 
 class DownloadReportResource(HTTPMethodView):
     async def get(self, request, document_id):
-        await download_file(document_id)
-        return json({'msg': 'Requested file was successfully downloaded'}, status=200)
+        csv_file = await download_file(document_id)
+        return await file(csv_file, status=200,
+                    headers={"Content-type": "text/csv",
+                             "Content-Disposition": f"inline; filename={csv_file}"})
