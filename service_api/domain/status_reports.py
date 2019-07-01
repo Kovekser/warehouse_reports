@@ -1,4 +1,6 @@
+from os import path
 from celery.result import AsyncResult
+from sqlalchemy import select
 
 from service_api.models import ReportStatus
 from service_api.services.db import select_statement, execute_statement
@@ -34,3 +36,19 @@ async def update_proc_status_by_id(data):
         values(**data).\
         where(ReportStatus.c.task_id == data['task_id'])
     return await execute_statement(statement)
+
+
+async def get_file_name_by_id(document_id):
+    statement = select([ReportStatus.c.file_name]). \
+        select_from(ReportStatus). \
+        where(ReportStatus.c.task_id == document_id)
+    process_status = await get_proc_status_by_id(document_id)
+
+    if process_status['status'] == 'SUCCESS':
+        return await select_statement(statement)
+
+
+async def download_file(document_id):
+    file_url = await get_file_name_by_id(document_id)
+    with open(file_url['file_name'], 'rb') as fr, open(path.join('uploads', file_url['file_name']), 'wb') as fw:
+        fw.write(fr.read())

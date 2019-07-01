@@ -5,7 +5,8 @@ from sanic.response import json
 from service_api.services.tasks import generate_csv_report
 from service_api.forms import ReportInputSchema
 from service_api.domain.status_reports import (get_proc_status_by_id,
-                                               insert_proc)
+                                               insert_proc,
+                                               download_file)
 
 
 class GenerateReportResource(HTTPMethodView):
@@ -24,7 +25,13 @@ class GenerateReportResource(HTTPMethodView):
                     status=200)
 
 
-class StatusReportResourse(HTTPMethodView):
+class StatusReportResource(HTTPMethodView):
     async def get(self, request, task_id):
         result = await get_proc_status_by_id(task_id)
         return json({'process_status': result['status']})
+
+
+class DownloadReportResource(HTTPMethodView):
+    async def get(self, request, document_id):
+        await download_file(document_id)
+        return json({'msg': 'Requested file was successfully downloaded'}, status=200)
