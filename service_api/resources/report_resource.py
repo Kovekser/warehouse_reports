@@ -32,7 +32,13 @@ class StatusReportResource(HTTPMethodView):
 
 class DownloadReportResource(HTTPMethodView):
     async def get(self, request, document_id):
-        csv_file = await download_file(document_id)
-        return await file(csv_file, status=200,
-                    headers={"Content-type": "text/csv",
-                             "Content-Disposition": f"inline; filename={csv_file}"})
+        try:
+            csv_file = await download_file(document_id)
+            if csv_file:
+                return await file(csv_file, status=200,
+                                  headers={"Content-type": "text/csv",
+                                           "Content-Disposition": f"inline; filename={csv_file}"})
+            else:
+                return json({'msg': 'Report is not ready'})
+        except Exception as err:
+            return json({'error': err}, status=404)

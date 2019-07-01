@@ -43,10 +43,16 @@ async def get_file_name_by_id(document_id):
         where(ReportStatus.c.task_id == document_id)
     process_status = await get_proc_status_by_id(document_id)
 
-    if process_status['status'] == 'SUCCESS':
+    if process_status['status'] == 'FAILED':
+        result = AsyncResult(document_id)
+        return result.info
+    else:
         return await select_statement(statement)
 
 
 async def download_file(document_id):
-    file_url = await get_file_name_by_id(document_id)
-    return file_url['file_name']
+    result = await get_file_name_by_id(document_id)
+    try:
+        return result['file_name']
+    except:
+        raise Exception(result)
