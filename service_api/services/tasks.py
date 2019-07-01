@@ -5,8 +5,8 @@ from celery import shared_task
 from service_api.domain.reports import CSVReports
 
 
-@shared_task
-def generate_csv_report(rtype, headers, data):
+@shared_task(bind=True)
+def generate_csv_report(self, rtype, headers, data):
     result = run_in_new_loop(CSVReports(rtype, headers, data).generate_csv_report())
     return result
 

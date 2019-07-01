@@ -9,13 +9,6 @@ setup:
 	virtualenv -p python3.7 --always-copy --system-site-packages venv; \
 	. venv/bin/activate; pip3 install -r requirements/requirements.txt
 
-.PHONY: run_app
-run_app:
-	python manage.py
-
-.PHONY: clean
-clean:
-	rm -rf venv
 
 .PHONY: test
 test:

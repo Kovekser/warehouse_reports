@@ -14,7 +14,6 @@ class CSVReports:
         """
         Function checks if there are rows with length more than length of header
         and deletes invalid rows if any
-
         """
         for i, row in enumerate(data):
             if len(row) != len(head):
@@ -22,9 +21,11 @@ class CSVReports:
         return data
 
     async def generate_csv_report(self):
+        from time import sleep
+        sleep(120)
         try:
-            with open(self.csv_name, 'w', newline='') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.head, delimeter=',', quotechar='"')
+            with open(self.csv_name, 'w', newline='') as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=self.head, delimiter=',', quotechar='"')
 
                 writer.writeheader()
                 writer.writerows(self.__data)
@@ -32,4 +33,4 @@ class CSVReports:
         except ValueError as err:
             if os.path.exists(self.csv_name):
                 os.remove(self.csv_name)
-            return {'error': str(err)}
+            raise ValueError(err)
