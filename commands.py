@@ -1,6 +1,10 @@
+import os
+
 from sanic.server import HttpProtocol
+from aiopg.sa import create_engine
 
 from service_api.application import app
+from service_api.config import select_db_config
 
 
 def runserver():
@@ -12,3 +16,40 @@ def runserver():
             super().__init__(*args, request_timeout=300, **kwargs)
 
     app.run(protocol=CGDPHttpProtocol)
+
+
+class InitDB:
+
+    def __init__(self, db_name):
+        self.db_name = db_name
+
+    async def create_db(self):
+        async with create_engine(**select_db_config()) as engine:
+            async with engine.acquire() as conn:
+                exists = await conn.execute(f"SELECT 1 FROM pg_database WHERE datname = '{self.db_name}'")
+                if not exists.rowcount:
+                    conn.autocommit = True
+                    await conn.execute("CREATE DATABASE {};".format(self.db_name))
+
+                    # Automatic migration
+                    script_dir = os.path.dirname(__file__)
+                    LIQUIBASE_COMMAND = """
+                                    sudo {} --driver={} --classpath={} --changeLogFile={} --url={} --username={} --password={} --logLevel=info {}
+                                """
+                    liquibase_command = LIQUIBASE_COMMAND.format(
+                        os.path.join(script_dir, "./migrations/liquibase"),
+                        "org.postgresql.Driver",
+                        os.path.join(script_dir, "./migrations/jdbcdrivers/postgresql-42.2.5.jar"),
+                        os.path.join(script_dir, "./migrations/changelog.xml"),
+                        f"jdbc:postgresql://localhost/{self.db_name}",
+                        'postgres',
+                        'admin',
+                        "migrate"
+                    )
+                    os.system(liquibase_command)
+
+    async def remove_test_db(self):
+        async with create_engine(**select_db_config()) as engine:
+            async with engine.acquire() as conn:
+                conn.autocommit = True
+                await conn.execute("DROP DATABASE IF EXISTS {} ;".format(self.db_name))

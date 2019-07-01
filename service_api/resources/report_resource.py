@@ -1,8 +1,11 @@
+from time import sleep, localtime
 from sanic.views import HTTPMethodView
 from sanic.response import json
 
 from service_api.services.tasks import generate_csv_report
 from service_api.forms import ReportInputSchema
+from service_api.domain.status_reports import (get_proc_status_by_id,
+                                               insert_proc)
 
 
 class GenerateReportResource(HTTPMethodView):
@@ -10,8 +13,18 @@ class GenerateReportResource(HTTPMethodView):
         data, err = ReportInputSchema().load(request.json)
         if err:
             return json({'Errors': err}, status=404)
-        try:
-            result_msg = generate_csv_report.delay(data['rtype'], data['headers'], data['data'])
-            return json(result_msg.get(timeout=2), status=200)
-        except ValueError as err:
-            return json({'error': str(err)}, status=404)
+
+        result = generate_csv_report.delay(data['report_type'], data['headers'], data['data'])
+        await insert_proc({'task_id': result.id,
+                          'status': result.state,
+                          'report_type': data['report_type']})
+
+        return json({'msg': f'Process with id {result.id} was successfully launched',
+                     'process_id': result.id},
+                    status=200)
+
+
+class StatusReportResourse(HTTPMethodView):
+    async def get(self, request, task_id):
+        result = await get_proc_status_by_id(task_id)
+        return json({'process_status': result['status']})
