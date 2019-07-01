@@ -6,8 +6,8 @@ from service_api.domain.reports import CSVReports
 
 
 @shared_task(bind=True)
-def generate_csv_report(self, rtype, headers, data):
-    result = run_in_new_loop(CSVReports(rtype, headers, data).generate_csv_report())
+def generate_csv_report(self, report_type, headers, data):
+    result = run_in_new_loop(CSVReports(report_type, headers, data).generate_csv_report())
     return result
 
 

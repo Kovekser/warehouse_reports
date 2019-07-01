@@ -7,7 +7,9 @@ from service_api.services.db import select_statement, execute_statement
 async def update_task_status(task_id):
     result = AsyncResult(task_id)
     if result.successful():
-        await update_proc_status_by_id({'task_id': task_id, 'status': 'SUCCESS'})
+        await update_proc_status_by_id({'task_id': task_id,
+                                        'status': 'SUCCESS',
+                                        'file_name': result.get()['file_name']})
     elif result.failed():
         await update_proc_status_by_id({'task_id': task_id, 'status': 'FAILED'})
     else:

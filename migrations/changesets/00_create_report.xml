@@ -20,7 +20,7 @@
             <column name="status" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="rtype" type="TEXT">
+            <column name="report_type" type="TEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="file_name" type="TEXT">

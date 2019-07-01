@@ -4,8 +4,8 @@ from datetime import datetime
 
 
 class CSVReports:
-    def __init__(self, rtype, head, data):
-        self.csv_name = f'{rtype}_{datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S_%f")}.csv'
+    def __init__(self, report_type, head, data):
+        self.csv_name = f'{report_type}_{datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S_%f")}.csv'
         self.head = head
         self.__data = self.check_data(data, head)
 
@@ -21,15 +21,14 @@ class CSVReports:
         return data
 
     async def generate_csv_report(self):
-        from time import sleep
-        sleep(120)
         try:
             with open(self.csv_name, 'w', newline='') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=self.head, delimiter=',', quotechar='"')
 
                 writer.writeheader()
                 writer.writerows(self.__data)
-            return {'msg': f'Report {self.csv_name} was successfully generated and downloaded to disc'}
+            return {'msg': f'Report {self.csv_name} was successfully generated and downloaded to disc',
+                    'file_name': self.csv_name}
         except ValueError as err:
             if os.path.exists(self.csv_name):
                 os.remove(self.csv_name)

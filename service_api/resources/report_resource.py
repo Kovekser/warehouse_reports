@@ -14,17 +14,17 @@ class GenerateReportResource(HTTPMethodView):
         if err:
             return json({'Errors': err}, status=404)
 
-        result = generate_csv_report.delay(data['rtype'], data['headers'], data['data'])
+        result = generate_csv_report.delay(data['report_type'], data['headers'], data['data'])
         await insert_proc({'task_id': result.id,
                           'status': result.state,
-                          'rtype': data['rtype']})
+                          'report_type': data['report_type']})
 
         return json({'msg': f'Process with id {result.id} was successfully launched',
-                     'proc_id': result.id},
+                     'process_id': result.id},
                     status=200)
 
 
 class StatusReportResourse(HTTPMethodView):
     async def get(self, request, task_id):
         result = await get_proc_status_by_id(task_id)
-        return json({'proc_status': result['status']})
+        return json({'process_status': result['status']})
