@@ -59,7 +59,7 @@ class StatusReportResourceTest(BaseTestCase):
 
         self.assertEqual(200, response.status)
         self.assertEqual({'process_status': 'PENDING',
-                         'msg': 'Report is not ready'},
+                          'msg': 'Report is not ready'},
                          response.json)
 
     @patch("service_api.resources.report_resource.get_process_object_by_id",
@@ -67,7 +67,7 @@ class StatusReportResourceTest(BaseTestCase):
     def test_get_status_failed(self):
         response = self.test_client.get(self.url, gather_request=False)
 
-        self.assertEqual(404, response.status)
+        self.assertEqual(200, response.status)
         self.assertEqual({'process_status': 'FAILED',
                           'msg': 'ValueError("dict contains fields not in fieldnames: \'d\'")'},
                          response.json)

@@ -3,6 +3,7 @@ from freezegun import freeze_time
 
 from tests import BaseTestCase
 from service_api.domain.reports import CSVReports
+from tests.resource_tests import REPORT_INPUT_MOCK
 
 
 @freeze_time("2019-07-01 07:46:24.127902")
@@ -31,12 +32,17 @@ class CSVReportsTest(BaseTestCase):
         self.assertEqual("dict contains fields not in fieldnames: 'd'", str(err.exception))
 
     async def test_generate_csv_report_success(self):
+
         expected = {'msg': f'Report test_2019_07_01_07_46_24_127902.csv was successfully generated and downloaded to disc',
                     'file_name': 'test_2019_07_01_07_46_24_127902.csv'}
-        csv_reports = CSVReports(report_type='test',
-                                 head=["a", "b", "c"],
-                                 data=[{"a": 4, "b": 5, "c": 7}])
+        csv_reports = CSVReports(**REPORT_INPUT_MOCK)
         result = await csv_reports.generate_csv_report()
 
         self.assertTrue(os.path.exists('test_2019_07_01_07_46_24_127902.csv'))
         self.assertDictEqual(expected, result)
+
+        with open('test_2019_07_01_07_46_24_127902.csv', 'r') as f:
+            data = f.readlines()
+            self.assertEqual('a,b,c\n', data[0])
+            self.assertEqual('1,2,3\n', data[1])
+            self.assertEqual('4,5,6\n', data[2])

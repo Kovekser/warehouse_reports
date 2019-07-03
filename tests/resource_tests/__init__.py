@@ -1,6 +1,6 @@
 REPORT_INPUT_MOCK = {
     "report_type": "test",
-    "headers": ["a", "b", "c"],
+    "head": ["a", "b", "c"],
     "data": [{"a": 1, "b": 2, "c": 3}, {"a": 4, "b": 5, "c": 6}]
 }
 

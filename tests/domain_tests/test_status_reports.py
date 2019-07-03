@@ -18,7 +18,7 @@ class ReportsStatusTest(BaseDomainTest):
                                      'report_type': 'test'})
         result = await get_process_object_by_id('821d9bca-59b0-487e-9639-460b2805e3e2')
 
-        self.assertEqual(6, len(result))
+        self.assertEqual(6, len(result.keys()))
         self.assertEqual('821d9bca-59b0-487e-9639-460b2805e3e2', str(result.get('task_id')))
         self.assertEqual('SUCCESS', result.get('status'))
         self.assertEqual('test_2019_07_01_07_46_24_127902.csv', result.get('file_name'))

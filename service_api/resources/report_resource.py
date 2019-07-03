@@ -31,7 +31,7 @@ class StatusReportResource(HTTPMethodView):
                          'msg': 'Report is not ready'}, status=200)
         elif process_obj['status'] == 'FAILED':
             return json({'process_status': process_obj['status'],
-                         'msg': process_obj['details']}, status=404)
+                         'msg': process_obj['details']}, status=200)
         elif process_obj['status'] == 'SUCCESS':
             return json({'process_status': process_obj['status']}, status=200)
 
