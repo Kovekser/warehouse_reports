@@ -10,7 +10,7 @@ def create_app():
     app.add_route(SmokeResource.as_view(), "/smoke")
     app.add_route(GenerateReportResource.as_view(), "/report")
     app.add_route(StatusReportResource.as_view(), "report/status/<task_id>")
-    app.add_route(DownloadReportResource.as_view(), "report/download/<document_id>")
+    app.add_route(DownloadReportResource.as_view(), "report/download/<task_id>")
     return app
 
 app = create_app()

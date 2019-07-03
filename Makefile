@@ -17,3 +17,13 @@ test:
 .PHONY: report_test
 report_test:
 	coverage report -m --omit=/usr/*
+
+
+.PHONY: liq_migrate
+liq_migrate:
+	./migrations/liquibase --url=jdbc:postgresql://localhost/whreports \
+	--driver=org.postgresql.Driver \
+	--classpath=./migrations/jdbcdrivers/postgresql-42.2.5.jar \
+	--username=postgres \
+	--password=admin \
+	--changeLogFile=/migrations/changelog.xml migrate
