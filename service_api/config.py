@@ -1,5 +1,4 @@
 import sys
-import inspect
 
 
 class CeleryConfig:
@@ -9,28 +8,27 @@ class CeleryConfig:
 
 
 def select_db_config():
-    caller = inspect.currentframe().f_back.f_code.co_name
-
     if 'test' in str(sys.argv[0]):
-        DB_CONFIG = {
+        db_config = {
             'host': 'localhost',
             'user': 'postgres',
             'password': 'admin',
-            'database': 'rstatus_test_db'
+            'database': 'test_db'
         }
-    elif caller == 'create_db':
-        DB_CONFIG = {
+    else:
+        db_config = {
             'host': 'localhost',
-            'user': 'postgres',
-            'password': 'admin',
-            'database': 'postgres'
-        }
-    elif caller in ('select_statement', 'execute_statement'):
-        DB_CONFIG = {
-            'host': 'localhost',
-            'user': 'postgres',
+            'user': 'admin',
             'password': 'admin',
             'database': 'whreports'
         }
 
-    return DB_CONFIG
+    return db_config
+
+
+BASIC_DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'postgres',
+    'password': 'admin',
+    'database': 'postgres'
+}

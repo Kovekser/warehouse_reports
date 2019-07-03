@@ -11,19 +11,22 @@ async def update_task_status(task_id):
                                         'status': 'SUCCESS',
                                         'file_name': result.get()['file_name']})
     elif result.failed():
-        await update_proc_status_by_id({'task_id': task_id, 'status': 'FAILED'})
+        await update_proc_status_by_id({'task_id': task_id,
+                                        'status': 'FAILED',
+                                        'details': str(result.info)})
     else:
-        await update_proc_status_by_id({'task_id': task_id, 'status': 'PENDING'})
+        await update_proc_status_by_id({'task_id': task_id,
+                                        'status': 'PENDING'})
 
 
-async def get_proc_status_by_id(task_id):
+async def get_process_object_by_id(task_id):
     await update_task_status(task_id)
     statement = ReportStatus.select(). \
         where(ReportStatus.c.task_id == task_id)
     return await select_statement(statement)
 
 
-async def insert_proc(data):
+async def insert_process_object(data):
     statement = ReportStatus.insert().\
         values(**data)
     await execute_statement(statement)
@@ -33,4 +36,4 @@ async def update_proc_status_by_id(data):
     statement = ReportStatus.update().\
         values(**data).\
         where(ReportStatus.c.task_id == data['task_id'])
-    return await execute_statement(statement)
+    await execute_statement(statement)

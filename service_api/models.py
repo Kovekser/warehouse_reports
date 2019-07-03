@@ -17,4 +17,5 @@ ReportStatus = Table(
     Column('status', String, nullable=False),
     Column('report_type', String, nullable=False),
     Column('file_name', String, default=None),
+    Column('details', String, default=None)
 )
