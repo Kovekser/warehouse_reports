@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  mydb:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    container_name: "my_postgres"
+    volumes:
+      - mydb_data:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:latest
+    hostname: "rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "686314"
+      RABBITMQ_DEFAULT_VHOST: "warehousehost"
+    restart: always
+  web_reports:
+    build: .
+    ports:
+      - "4001:8001"
+    volumes:
+      - .:/app2
+    depends_on:
+      - mydb
+      - rabbitmq
+      - celery
+    environment:
+      SANIC_ENV: development
+      DOCK_ENV: 'True'
+    restart: always
+  celery:
+    build: .
+    command: celery -A service_api worker --loglevel=info
+    volumes:
+      - .:/app2
+    depends_on:
+      - mydb
+      - rabbitmq
+    links:
+      - rabbitmq
+    restart: always
+    environment:
+      SANIC_ENV: development
+      DOCK_ENV: 'True'
+volumes:
+  mydb_data:
